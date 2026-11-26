@@ -781,6 +781,7 @@ const state = {
   heroClass: null,
   earnedTitles: [],
   activeTitle: null,
+  appliedSeeds: [],
   habits: [],
   journeyStart: localDate(),
   hardMode: false,
@@ -807,6 +808,7 @@ function load(data) {
   state.heroClass = typeof data.heroClass === 'string' ? data.heroClass : null;
   state.earnedTitles = Array.isArray(data.earnedTitles) ? data.earnedTitles : [];
   state.activeTitle = typeof data.activeTitle === 'string' ? data.activeTitle : null;
+  state.appliedSeeds = Array.isArray(data.appliedSeeds) ? data.appliedSeeds : [];
 }
 load(saved);
 
@@ -843,6 +845,7 @@ async function connect() {
       try { localStorage.setItem(storageKey, JSON.stringify(state)); } catch {}
       fillKinds();
       settle(true);
+      applySeeds();
       checkTitles(true);
       render();
       setSync('Salvo na sua conta');
@@ -2261,21 +2264,16 @@ function baseXp(e) {
   if (e.kind === 'habit') return 10;
   return Math.max(1, Math.round(e.amount));
 }
-get('import').onclick = () => {
-  const status = get('import-status');
-  let data;
-  try {
-    data = JSON.parse(get('import-text').value.trim());
-  } catch {
-    status.textContent = 'Não consegui ler esse texto. Cole exatamente o texto que começa com { e termina com }.';
-    return;
-  }
+function mergeRecords(data, extra = {}) {
   const list = Array.isArray(data) ? data : Array.isArray(data?.history) ? data.history : null;
-  if (!list) { status.textContent = 'Não encontrei registros nesse texto.'; return; }
+  if (!list) return null;
   const known = new Set(state.history.map(entryKey));
   const added = [];
   let skipped = 0, invalid = 0;
-  const gymNew = [];
+  const gymExercises = [...state.gymExercises];
+  const addGym = (name, group, target) => {
+    if (!gymExercises.some(g => g.name === name)) gymExercises.push({ name, group: groups[group] ? group : 'outros', target: Math.min(7, Math.max(1, target || 1)) });
+  };
   for (const raw of list) {
     const e = { ...raw };
     if (e.kind === 'custom' && e.exerciseName) e.kind = `custom:${e.exerciseName}`;
@@ -2284,9 +2282,7 @@ get('import').onclick = () => {
     if (e.kind === 'gym') {
       if (typeof e.gymName !== 'string' || !(e.sets > 0) || !(e.reps > 0)) { invalid += 1; continue; }
       e.amount = e.sets * e.reps;
-      if (!state.gymExercises.some(g => g.name === e.gymName) && !gymNew.some(g => g.name === e.gymName)) {
-        gymNew.push({ name: e.gymName, group: groups[e.group] ? e.group : 'outros', target: 1 });
-      }
+      addGym(e.gymName, e.group, 1);
       delete e.group;
     } else if (e.kind === 'habit') {
       if (typeof e.habitName !== 'string') { invalid += 1; continue; }
@@ -2299,35 +2295,60 @@ get('import').onclick = () => {
     known.add(key);
     added.push(e);
   }
-  if (!added.length) {
-    status.textContent = `Nada novo para importar.${skipped ? ` ${skipped} já estavam no app.` : ''}${invalid ? ` ${invalid} não foram reconhecidos.` : ''}`;
+  for (const g of Array.isArray(data?.gymExercises) ? data.gymExercises : []) {
+    if (g && typeof g.name === 'string') addGym(g.name, g.group, g.target);
+  }
+  const workouts = [...state.workouts];
+  for (const w of Array.isArray(data?.workouts) ? data.workouts : []) {
+    if (w && typeof w.name === 'string' && Array.isArray(w.days) && Array.isArray(w.exercises) && !workouts.some(x => x.name === w.name)) {
+      workouts.push({ id: `w${Date.now().toString(36)}${workouts.length}`, name: w.name, days: w.days, exercises: w.exercises });
+    }
+  }
+  const history = added.length
+    ? [...added, ...state.history].sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0)
+    : state.history;
+  save({ history, gymExercises, workouts, ...extra });
+  return { added: added.length, skipped, invalid, plans: workouts.length - state.workouts.length };
+}
+
+get('import').onclick = () => {
+  const status = get('import-status');
+  let data;
+  try {
+    data = JSON.parse(get('import-text').value.trim());
+  } catch {
+    status.textContent = 'Não consegui ler esse texto. Cole exatamente o texto que começa com { e termina com }.';
     return;
   }
   const before = standing();
-  const history = [...added, ...state.history].sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0);
-  const changes = { history };
-  if (gymNew.length) changes.gymExercises = [...state.gymExercises, ...gymNew];
-  if (Array.isArray(data?.gymExercises)) {
-    const merged = [...(changes.gymExercises || state.gymExercises)];
-    for (const g of data.gymExercises) {
-      if (g && typeof g.name === 'string' && !merged.some(x => x.name === g.name)) merged.push({ name: g.name, group: groups[g.group] ? g.group : 'outros', target: Math.min(7, Math.max(1, g.target || 1)) });
-    }
-    changes.gymExercises = merged;
-  }
-  if (Array.isArray(data?.workouts)) {
-    const plans = [...state.workouts];
-    for (const w of data.workouts) {
-      if (w && typeof w.name === 'string' && Array.isArray(w.days) && Array.isArray(w.exercises) && !plans.some(x => x.name === w.name)) plans.push({ id: `w${Date.now().toString(36)}${plans.length}`, name: w.name, days: w.days, exercises: w.exercises });
-    }
-    changes.workouts = plans;
-  }
-  save(changes);
+  const r = mergeRecords(data);
+  if (!r) { status.textContent = 'Não encontrei registros nesse texto.'; return; }
+  const extras = `${r.skipped ? ` ${r.skipped} repetidos ignorados.` : ''}${r.invalid ? ` ${r.invalid} não reconhecidos.` : ''}`;
+  if (!r.added) { status.textContent = `Nada novo para importar.${extras}`; render(); return; }
   get('import-text').value = '';
-  status.textContent = `${added.length} ${added.length === 1 ? 'registro importado' : 'registros importados'}.${skipped ? ` ${skipped} repetidos ignorados.` : ''}${invalid ? ` ${invalid} não reconhecidos.` : ''}`;
-  toast('Registros importados', `${added.length} ${added.length === 1 ? 'registro entrou' : 'registros entraram'} no seu histórico.`, 'big');
+  status.textContent = `${r.added} ${r.added === 1 ? 'registro importado' : 'registros importados'}.${extras}`;
+  toast('Registros importados', `${r.added} ${r.added === 1 ? 'registro entrou' : 'registros entraram'} no seu histórico.`, 'big');
   celebrate(before);
   render();
 };
+
+/* Workouts sent in the chat, added once per browser or account. */
+const seeds = [
+  { id: 'mfit-2026-11-23', title: 'Treinos do MFIT', data: {"history":[{"kind":"gym","gymName":"Pulldown com Corda","group":"costas","sets":4,"reps":10,"weight":45,"date":"2026-11-23"},{"kind":"gym","gymName":"Puxada Alta Articulada","group":"costas","sets":4,"reps":10,"weight":35,"date":"2026-11-23"},{"kind":"gym","gymName":"Puxada Neutra Triângulo","group":"costas","sets":4,"reps":10,"weight":50,"date":"2026-11-23"},{"kind":"gym","gymName":"Remada Curvada Máquina Peg. Pronada","group":"costas","sets":4,"reps":10,"weight":20,"date":"2026-11-23"},{"kind":"gym","gymName":"Remada Row Articulada Supinada","group":"costas","sets":4,"reps":10,"weight":25,"date":"2026-11-23"},{"kind":"gym","gymName":"Rosca Direta Barra W","group":"bracos","sets":4,"reps":10,"weight":20,"date":"2026-11-23"},{"kind":"gym","gymName":"Abdominal Supra com Corda na Polia","group":"core","sets":4,"reps":10,"weight":55,"date":"2026-11-23"},{"kind":"gym","gymName":"Crucifixo Máquina","group":"peito","sets":5,"reps":10,"weight":93,"date":"2026-11-24"},{"kind":"gym","gymName":"Supino Reto Sentado Articulado","group":"peito","sets":4,"reps":10,"weight":25,"date":"2026-11-24"},{"kind":"gym","gymName":"Supino Inclinado Articulado","group":"peito","sets":4,"reps":10,"weight":25,"date":"2026-11-24"},{"kind":"gym","gymName":"Crucifixo Inclinado Articulado","group":"peito","sets":4,"reps":10,"weight":10,"date":"2026-11-24"},{"kind":"gym","gymName":"Elevação Frontal na Polia com Corda","group":"ombros","sets":3,"reps":10,"weight":17.5,"date":"2026-11-24"},{"kind":"gym","gymName":"Elevação Lateral em Pé Máquina","group":"ombros","sets":3,"reps":10,"weight":40,"date":"2026-11-24"},{"kind":"gym","gymName":"Tríceps na Polia com Corda","group":"bracos","sets":4,"reps":10,"weight":50,"date":"2026-11-24"}],"workouts":[{"name":"Segunda — Dorsal + Bíceps + Abd","days":[0],"exercises":["Pulldown com Corda","Puxada Alta Articulada","Puxada Neutra Triângulo","Remada Curvada Máquina Peg. Pronada","Remada Row Articulada Supinada","Rosca Direta Barra W","Abdominal Supra com Corda na Polia"]},{"name":"Terça — Peitoral + Deltoides + Tríceps","days":[1],"exercises":["Crucifixo Máquina","Supino Reto Sentado Articulado","Supino Inclinado Articulado","Crucifixo Inclinado Articulado","Elevação Frontal na Polia com Corda","Elevação Lateral em Pé Máquina","Tríceps na Polia com Corda"]}]} }
+];
+function applySeeds() {
+  const applied = Array.isArray(state.appliedSeeds) ? state.appliedSeeds : [];
+  for (const seed of seeds) {
+    if (applied.includes(seed.id)) continue;
+    const before = standing();
+    const r = mergeRecords(seed.data, { appliedSeeds: [...applied, seed.id] });
+    applied.push(seed.id);
+    if (r && (r.added || r.plans)) {
+      toast(seed.title, `${r.added} ${r.added === 1 ? 'registro adicionado' : 'registros adicionados'} à academia de segunda e terça.`, 'big');
+      celebrate(before);
+    }
+  }
+}
 
 get('export').onclick = () => {
   const text = JSON.stringify({ ...state, ...(legacy ? { legacy } : {}) }, null, 2);
@@ -2354,6 +2375,7 @@ kindInput.addEventListener('change', updateForm);
 fillKinds();
 updateForm();
 settle();
+applySeeds();
 checkTitles(true);
 if (!saved?.journeyStart) persist();
 render();
