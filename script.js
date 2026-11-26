@@ -13,6 +13,7 @@ const missions = [
 ];
 const ranks = ['E', 'D', 'C', 'B', 'A', 'S'];
 const storageKey = 'rank-ativo-v1';
+const weeklyGoal = 4;
 const xpPerLevel = 100;
 const missionBonus = 20;
 const get = id => document.getElementById(id);
@@ -30,6 +31,7 @@ function readStorage(key) {
 }
 
 const saved = readStorage(storageKey);
+let customExercises = Array.isArray(saved?.customExercises) ? saved.customExercises : [];
 const legacy = readStorage('gogo-flex-v1');
 let history = Array.isArray(saved?.history) ? saved.history : (legacy?.history ?? []).map(entry => ({
   kind: 'pushups',
@@ -39,8 +41,7 @@ let history = Array.isArray(saved?.history) ? saved.history : (legacy?.history ?
   legacyName: entry.name || `Gogo nº ${entry.number}`
 }));
 
-function today() {
-  const now = new Date();
+function localDate(now = new Date()) {
   return [now.getFullYear(), now.getMonth() + 1, now.getDate()]
     .map(value => String(value).padStart(2, '0')).join('-');
 }
@@ -56,7 +57,21 @@ function progressFor(kind, date) {
     .reduce((total, entry) => total + Math.round(entry.amount * 100), 0) / 100;
 }
 
+function renderWeeklyProgress() {
+  const monday = new Date();
+  const end = localDate(monday);
+  monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
+  const start = localDate(monday);
+  const trainingDays = new Set(history
+    .filter(entry => entry.date >= start && entry.date <= end)
+    .map(entry => entry.date)).size;
+
+  get('weekly-summary').textContent = `${trainingDays} de ${weeklyGoal} dias de treino nesta semana`;
+  get('weekly-progress').value = Math.min(trainingDays, weeklyGoal);
+}
+
 function render() {
+  renderWeeklyProgress();
   const xp = history.reduce((total, entry) => total + entry.xp, 0);
   const level = Math.floor(xp / xpPerLevel) + 1;
   const rank = ranks[Math.min(Math.floor((level - 1) / 3), ranks.length - 1)];
@@ -72,7 +87,7 @@ function render() {
     const title = document.createElement('strong');
     title.textContent = activities[kind];
     const progress = document.createElement('p');
-    const amount = progressFor(kind, today());
+    const amount = progressFor(kind, localDate());
     progress.textContent = amount >= goal
       ? `Concluída · +${missionBonus} XP`
       : `${quantity(kind, amount)} de ${quantity(kind, goal)}`;
@@ -103,7 +118,7 @@ function render() {
   for (const entry of history) {
     const item = document.createElement('li');
     const title = document.createElement('strong');
-    title.textContent = `${activities[entry.kind]} · ${quantity(entry.kind, entry.amount)}`;
+    title.textContent = `${entry.exerciseName || activities[entry.kind]} · ${quantity(entry.kind, entry.amount)}`;
     const details = document.createElement('small');
     const date = entry.date.split('-').reverse().join('/');
     const duration = entry.duration ? ` · ${entry.duration} min` : '';
@@ -129,13 +144,47 @@ function updateForm() {
 for (const [kind, label] of Object.entries(activities)) {
   kindInput.add(new Option(label, kind));
 }
+for (const name of customExercises) {
+  kindInput.add(new Option(name, `custom:${name}`));
+}
 kindInput.addEventListener('change', updateForm);
+
+get('custom-exercise').addEventListener('submit', event => {
+  event.preventDefault();
+  const input = get('exercise-name');
+  const name = input.value.trim();
+  const feedback = get('exercise-feedback');
+  feedback.hidden = false;
+  if (!name) {
+    feedback.textContent = 'Digite o nome do exercício.';
+    return;
+  }
+  const names = [...Object.values(activities), ...customExercises];
+  if (names.some(existing => existing.localeCompare(name, 'pt-BR', { sensitivity: 'base' }) === 0)) {
+    feedback.textContent = 'Esse exercício já está na lista de atividades.';
+    return;
+  }
+
+  const nextExercises = [...customExercises, name];
+  try {
+    localStorage.setItem(storageKey, JSON.stringify({ history, customExercises: nextExercises }));
+  } catch {
+    feedback.textContent = 'O navegador não conseguiu salvar o exercício.';
+    return;
+  }
+  customExercises = nextExercises;
+  kindInput.add(new Option(name, `custom:${name}`));
+  kindInput.value = `custom:${name}`;
+  updateForm();
+  input.value = '';
+  feedback.textContent = `${name} foi adicionado. Registre as repetições em Registrar atividade.`;
+});
 
 form.addEventListener('submit', event => {
   event.preventDefault();
   const kind = kindInput.value;
   const amount = amountInput.valueAsNumber;
-  const date = today();
+  const date = localDate();
   const mission = missions.find(item => item.kind === kind);
   const progress = progressFor(kind, date);
   const completed = mission && progress < mission.goal
@@ -143,10 +192,11 @@ form.addEventListener('submit', event => {
   const xp = Math.max(1, Math.round(kind === 'running' ? amount * 10 : amount))
     + (completed ? missionBonus : 0);
   const entry = { kind, amount, date, xp };
+  if (kind.startsWith('custom:')) entry.exerciseName = kind.slice(7);
   if (!durationInput.disabled && durationInput.value) entry.duration = durationInput.valueAsNumber;
   const nextHistory = [entry, ...history];
   try {
-    localStorage.setItem(storageKey, JSON.stringify({ history: nextHistory }));
+    localStorage.setItem(storageKey, JSON.stringify({ history: nextHistory, customExercises }));
   } catch {
     get('feedback').textContent = 'O navegador não conseguiu salvar a atividade. Confira o armazenamento e tente novamente.';
     return;
@@ -158,7 +208,7 @@ form.addEventListener('submit', event => {
 });
 
 get('export').onclick = () => {
-  const blob = new Blob([JSON.stringify({ history, ...(legacy ? { legacy } : {}) }, null, 2)], {
+  const blob = new Blob([JSON.stringify({ history, customExercises, ...(legacy ? { legacy } : {}) }, null, 2)], {
     type: 'application/json'
   });
   const url = URL.createObjectURL(blob);

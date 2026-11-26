@@ -3,6 +3,8 @@
 Aplicativo web em português para registrar exercícios e corridas, completar missões diárias e evoluir do rank E ao S.
 
 - Registre flexões, agachamentos e abdominais em repetições.
+- Adicione seus próprios exercícios e registre as repetições.
+- Acompanhe a meta de 4 dias de treino por semana, de segunda a domingo. Atividades no mesmo dia contam uma vez.
 - Registre corridas em quilômetros, com duração opcional em minutos.
 - Complete metas diárias de 10 flexões, 15 agachamentos e 1 km de corrida para ganhar 20 XP extras por missão.
 - Suba um nível a cada 100 XP e avance de rank a cada três níveis, até o rank S.

@@ -39,3 +39,5 @@ button.secondary { background: transparent; border-color: #626978; color: inheri
 .mission button { margin-top: .4rem; }
 #history { list-style: none; padding: 0; margin-bottom: 0; }
 #history small { display: block; color: var(--muted); margin-top: .25rem; }
+
+#exercicios { margin-top: 1rem; }

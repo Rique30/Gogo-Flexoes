@@ -11,7 +11,7 @@
 <body>
   <header class="shell top">
     <div class="brand">RANK <span>ATIVO</span></div>
-    <nav aria-label="Navegação"><a href="#missoes">Missões</a><a href="#registro">Registrar</a><a href="#historico">Histórico</a></nav>
+    <nav aria-label="Navegação"><a href="#missoes">Missões</a><a href="#registro">Registrar</a><a href="#exercicios">Meus exercícios</a><a href="#historico">Histórico</a></nav>
   </header>
   <main class="shell">
     <section class="hero" aria-labelledby="rank">
@@ -48,6 +48,17 @@
         </form>
       </section>
     </div>
+    <section class="card" id="exercicios">
+      <h2>Meus exercícios</h2>
+      <p id="weekly-summary">0 de 4 dias de treino nesta semana</p>
+      <progress id="weekly-progress" aria-labelledby="weekly-summary" max="4" value="0"></progress>
+      <form id="custom-exercise">
+        <label for="exercise-name">Nome do exercício</label>
+        <input id="exercise-name" type="text" maxlength="60" required>
+        <button type="submit">Adicionar à lista de atividades</button>
+        <p id="exercise-feedback" role="status" hidden></p>
+      </form>
+    </section>
     <section class="card" id="historico">
       <div class="row"><h2>Histórico</h2><button id="export" class="secondary">Exportar JSON</button></div>
       <ul id="history"></ul>
