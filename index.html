@@ -595,7 +595,7 @@ textarea { width: 100%; min-height: 9rem; font: .78rem/1.45 ui-monospace, "SFMon
         <button type="button" class="switch" id="hard-toggle" role="switch" aria-checked="false" aria-labelledby="hard-title"></button>
       </div>
       <ul class="rules">
-        <li>As metas das missões dobram: 20 flexões, 30 agachamentos e 2 km de corrida.</li>
+        <li>As metas das missões sobem: 30 flexões, 30 agachamentos e 5 km de corrida.</li>
         <li>Cada missão concluída vale 40 XP de bônus em vez de 20.</li>
         <li>Cada dia perdido tira 30 XP.</li>
         <li>Perder 2 dias seguidos recomeça a jornada no Dia 1.</li>
@@ -849,7 +849,8 @@ async function connect() {
 
 /* Rules */
 const isHard = date => state.hardMode && state.hardModeSince && date >= state.hardModeSince;
-const goalFor = (kind, date) => missions.find(m => m.kind === kind).goal * (isHard(date) ? 2 : 1);
+const hardGoals = { pushups: 30, squats: 30, running: 5 };
+const goalFor = (kind, date) => isHard(date) ? hardGoals[kind] : missions.find(m => m.kind === kind).goal;
 const classes = {
   aura: { name: 'Usuário de Aura', attr: 'Força', color: '#e39a7c', icon: '<path d="M14.5 3.5l6 6-9 9-3-3-3 3-2-2 3-3-3-3z"/>', lore: 'Canaliza a mana no reforço do próprio corpo. Pensa em corpo, instinto e impacto.', perk: '+15% de XP em flexões, agachamentos, abdominais e exercícios próprios.', boost: { reps: .15 } },
   arsenal: { name: 'Portador do Arsenal', attr: 'Força', color: '#e8c07a', icon: icons.academia, lore: 'Como o Armazenamento de Armas de Alan: cada exercício da academia é uma arma guardada, pronta para ser invocada.', perk: '+20% de XP nos treinos de academia.', boost: { gym: .2 } },
@@ -2230,7 +2231,7 @@ get('hard-toggle').onclick = () => {
     toast('Modo Difícil desativado', 'As metas voltam ao normal a partir de hoje.');
   } else {
     save({ hardMode: true, hardModeSince: addDays(today, 1), settledThrough: today, hardMisses: 0 });
-    toast('Modo Difícil ativado', 'Começa amanhã: metas em dobro, bônus em dobro. Não perca 2 dias seguidos.', 'bad');
+    toast('Modo Difícil ativado', 'Começa amanhã: 30 flexões, 30 agachamentos e 5 km, com bônus em dobro. Não perca 2 dias seguidos.', 'bad');
   }
   render();
 };
