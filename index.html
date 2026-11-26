@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#100d12">
-  <title>Rank Ativo</title>
+  <title>Sombras do Destino</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body>
   <header class="shell top">
-    <div class="brand">RANK <span>ATIVO</span></div>
-    <nav aria-label="Navegação"><a href="#missoes">Missões</a><a href="#registro">Registrar</a><a href="#exercicios">Meus exercícios</a><a href="#historico">Histórico</a></nav>
+    <div class="brand">SOMBRAS <span>DO DESTINO</span></div>
+    <nav aria-label="Navegação"><a href="#jornada">Jornada</a><a href="#missoes">Missões</a><a href="#registro">Registrar</a><a href="#exercicios">Exercícios e hábitos</a><a href="#historico">Histórico</a></nav>
   </header>
   <main class="shell">
     <section class="hero" aria-labelledby="ring">
@@ -25,13 +25,31 @@
         <progress id="xp-bar" value="0" max="100"></progress>
         <p id="xp-total"></p>
       </div>
+      <dl class="attributes" id="attributes"></dl>
     </section>
     <p id="feedback" role="status"></p>
+
+    <section class="card" id="jornada">
+      <div class="row">
+        <div>
+          <p class="label">Jornada de 66 dias</p>
+          <h2 id="journey-day">Dia 1 de 66</h2>
+        </div>
+        <p id="streak" class="streak"></p>
+      </div>
+      <p id="journey-summary"></p>
+      <ol id="journey-grid" class="journey-grid" aria-label="Dias da jornada"></ol>
+      <p class="legend"><span class="dot done"></span>Dia completo <span class="dot missed"></span>Dia perdido <span class="dot today"></span>Hoje</p>
+      <button id="restart" type="button" class="secondary">Recomeçar jornada</button>
+    </section>
+
     <div class="grid">
       <section class="card" id="missoes">
         <h2>Missões de hoje</h2>
-        <p>Escolha uma meta e registre a atividade para ganhar XP extra.</p>
+        <p>Complete todas as missões e hábitos para fechar o dia da jornada.</p>
         <div id="missions"></div>
+        <h3>Hábitos de hoje</h3>
+        <ul id="habits-today" class="habits"></ul>
       </section>
       <section class="card" id="registro">
         <h2>Registrar atividade</h2>
@@ -48,17 +66,28 @@
         </form>
       </section>
     </div>
+
     <section class="card" id="exercicios">
-      <h2>Meus exercícios</h2>
+      <h2>Exercícios e hábitos</h2>
       <p id="weekly-summary">0 de 4 dias de treino nesta semana</p>
       <progress id="weekly-progress" aria-labelledby="weekly-summary" max="4" value="0"></progress>
-      <form id="custom-exercise">
-        <label for="exercise-name">Nome do exercício</label>
-        <input id="exercise-name" type="text" maxlength="60" required>
-        <button type="submit">Adicionar à lista de atividades</button>
-        <p id="exercise-feedback" role="status" hidden></p>
-      </form>
+      <div class="grid inner">
+        <form id="custom-exercise">
+          <label for="exercise-name">Novo exercício</label>
+          <input id="exercise-name" type="text" maxlength="60" required>
+          <button type="submit">Adicionar à lista de atividades</button>
+          <p id="exercise-feedback" role="status" hidden></p>
+        </form>
+        <form id="custom-habit">
+          <label for="habit-name">Novo hábito diário (ex.: ler 10 páginas)</label>
+          <input id="habit-name" type="text" maxlength="60" required>
+          <button type="submit">Adicionar hábito</button>
+          <p id="habit-feedback" role="status" hidden></p>
+        </form>
+      </div>
+      <ul id="habit-list" class="habit-list"></ul>
     </section>
+
     <section class="card" id="historico">
       <div class="row"><h2>Histórico</h2><button id="export" class="secondary">Exportar JSON</button></div>
       <ul id="history"></ul>

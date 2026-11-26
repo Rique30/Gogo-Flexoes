@@ -43,3 +43,32 @@ button.secondary { background: transparent; border-color: #82687e; color: inheri
 #exercicios { margin-top: 1rem; }
 
 .hero h1 { font-family: Georgia, serif; color: var(--gold); }
+
+h3 { margin: 1.4rem 0 .4rem; font-size: 1.05rem; }
+.attributes { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(.4rem, 2vw, .75rem); margin: .5rem 0 0; }
+.attributes div { min-width: 0; padding: .7rem clamp(.5rem, 2vw, .85rem); border: 1px solid var(--border); border-radius: .6rem; background: #1a1219; }
+.attributes dt { color: var(--muted); font-size: clamp(.62rem, 2.4vw, .8rem); overflow-wrap: anywhere; text-transform: uppercase; letter-spacing: .08em; }
+.attributes dd { margin: .2rem 0 0; font-size: 1.4rem; font-weight: 800; color: var(--gold); }
+#jornada { margin-bottom: 1rem; }
+#jornada h2 { font-family: Georgia, serif; font-size: clamp(1.6rem, 5vw, 2.2rem); margin-top: .2rem; }
+.streak { color: var(--gold); font-weight: 750; margin: 0; }
+.journey-grid { list-style: none; padding: 0; margin: 1rem 0 .5rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(2.1rem, 1fr)); gap: .35rem; }
+.journey-grid li { aspect-ratio: 1; display: grid; place-items: center; border-radius: .4rem; font-size: .75rem; color: var(--muted); background: #171118; border: 1px solid #3a2b38; }
+.journey-grid li.done { background: var(--gold); color: #241921; border-color: var(--gold); font-weight: 800; }
+.journey-grid li.missed { background: #3a1c26; color: #d99aa8; border-color: #5c2a39; }
+.journey-grid li.today { outline: 2px solid var(--gold); outline-offset: 1px; color: #f3e9da; }
+.legend { font-size: .85rem; display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .9rem; }
+.dot { display: inline-block; width: .8rem; height: .8rem; border-radius: .2rem; margin-right: -.5rem; vertical-align: middle; }
+.dot.done { background: var(--gold); }
+.dot.missed { background: #3a1c26; border: 1px solid #5c2a39; }
+.dot.today { border: 2px solid var(--gold); }
+.habits, .habit-list { list-style: none; padding: 0; margin: 0; }
+.habits li { padding-block: .55rem; border-bottom: 1px solid var(--border); }
+.habits li.empty { color: var(--muted); }
+.habits label { display: flex; align-items: center; gap: .6rem; cursor: pointer; }
+.habits input { width: 1.25rem; height: 1.25rem; accent-color: var(--gold); padding: 0; }
+.grid.inner { margin-top: .5rem; }
+.habit-list { margin-top: 1rem; }
+.habit-list li { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: .5rem; border-bottom: 1px solid var(--border); }
+button.small { padding: .35rem .7rem; font-size: .85rem; }
+@media (max-width: 480px) { nav { gap: .4rem 1rem; justify-content: flex-start; } }

@@ -1,7 +1,10 @@
-# Rank Ativo
+# Sombras do Destino
 
 Aplicativo web em português para registrar exercícios e corridas, completar missões diárias e evoluir do Anel I ao Anel VI, inspirados em Sombras do Destino.
 
+- Siga uma jornada de 66 dias: um dia fica completo quando todas as missões e hábitos do dia são concluídos. Veja sua sequência de dias seguidos e recomece a jornada quando quiser.
+- Crie hábitos diários (como ler ou meditar) e marque-os todo dia para ganhar 10 XP cada.
+- Acompanhe os atributos Força, Resistência e Disciplina, calculados pelo XP de cada tipo de atividade.
 - Registre flexões, agachamentos e abdominais em repetições.
 - Adicione seus próprios exercícios e registre as repetições.
 - Acompanhe a meta de 4 dias de treino por semana, de segunda a domingo. Atividades no mesmo dia contam uma vez.
@@ -12,4 +15,4 @@ Aplicativo web em português para registrar exercícios e corridas, completar mi
 
 Abra `index.html` no navegador ou publique os arquivos estáticos na raiz do GitHub Pages. O projeto não tem dependências.
 
-Os dados ficam no armazenamento local do navegador. Se você abrir o Rank Ativo na mesma origem do Gogo Flex, o histórico antigo de flexões aparece no novo app. Esses registros preservam suas datas e repetições. O backup inclui também os dados antigos da coleção quando disponíveis. O registro de corridas é manual.
+Os dados ficam no armazenamento local do navegador. Se você abrir o Sombras do Destino na mesma origem do Gogo Flex, o histórico antigo de flexões aparece no novo app. Esses registros preservam suas datas e repetições. O backup inclui também os dados antigos da coleção quando disponíveis. O registro de corridas é manual.
