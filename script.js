@@ -11,7 +11,7 @@ const missions = [
   { kind: 'squats', goal: 15 },
   { kind: 'running', goal: 1 }
 ];
-const ranks = ['E', 'D', 'C', 'B', 'A', 'S'];
+const rings = ['I', 'II', 'III', 'IV', 'V', 'VI'];
 const storageKey = 'rank-ativo-v1';
 const weeklyGoal = 4;
 const xpPerLevel = 100;
@@ -74,8 +74,8 @@ function render() {
   renderWeeklyProgress();
   const xp = history.reduce((total, entry) => total + entry.xp, 0);
   const level = Math.floor(xp / xpPerLevel) + 1;
-  const rank = ranks[Math.min(Math.floor((level - 1) / 3), ranks.length - 1)];
-  get('rank').textContent = `Rank ${rank}`;
+  const ring = rings[Math.min(Math.floor((level - 1) / 3), rings.length - 1)];
+  get('ring').textContent = `Anel ${ring}`;
   get('level').textContent = `Nível ${level}`;
   get('xp-bar').value = xp % xpPerLevel;
   get('xp-label').textContent = `${xp % xpPerLevel} de ${xpPerLevel} XP para o próximo nível`;
