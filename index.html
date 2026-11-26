@@ -1,25 +1,57 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080808">
-<title>Gogo Flex | Portal da Vitória</title>
-<link rel="stylesheet" href="./style.css">
-</head><body>
-<div class="shell">
-<header class="head"><div class="logo">GOGO <span>FLEX</span> <span style="font-size:18px">✦</span></div><nav class="nav" aria-label="Navegação"><button data-tab="desafio" class="active">⚡ Desafio</button><button data-tab="colecoes">◈ Coleções</button><button data-tab="historico">▦ Histórico</button><button data-tab="portal">◎ Portal</button></nav></header>
-<div class="hero"><div><div class="eyebrow">Seu bonequinho. Sua conquista.</div><h1>Um Gogo surpresa.<br><span style="color:#a98afa">Uma nova missão.</span></h1><p class="lead">Pegue um Gogo físico sem olhar, digite o número das costas e transforme a surpresa em um desafio de flexões.</p></div><div class="tag">✦ Preto e branco • Gogo’s coloridos</div></div>
-<div class="stats"><div class="stat"><b id="total-flex">0</b><span>Flexões concluídas</span></div><div class="stat"><b id="total-days">0</b><span>Dias de treino</span></div><div class="stat"><b id="total-gogos">0</b><span>Gogo's registrados</span></div></div>
-<main>
-<section id="tab-desafio" class="grid">
-<div class="card"><div class="row"><h2>⚡ Desafio do Dia</h2><span class="tag" id="today"></span></div><p class="hint">A surpresa acontece com seus brinquedos de verdade. O app apenas identifica e guarda a memória do seu treino.</p>
-<div class="form"><div class="field"><label for="collection">Coleção</label><select id="collection"><option>Urban Toys (2008)</option><option>MegaTrip (2009)</option><option>Fut Gogo's (2010)</option><option>Turma da Mônica (2011)</option></select></div><div class="field"><label for="number">Número atrás do Gogo</label><input id="number" type="number" min="1" max="999" placeholder="Ex.: 24"></div><div class="field"><label for="gogo-name">Nome (opcional)</label><input id="gogo-name" maxlength="60" placeholder="Nome do personagem"></div><div class="field"><label for="date">Dia do sorteio</label><input id="date" type="date"></div></div>
-<button id="start" class="primary wide">Descobrir meu desafio →</button><div id="training" class="hidden"><div class="divider"></div><span class="eyebrow">MISSÃO ATIVA</span><div id="challenge-number" class="counter">0 <em>flexões</em></div><p class="hint">Registre quantas flexões concluiu. Você pode dividir o objetivo em várias séries.</p><div class="row"><button class="ghost" id="minus">− 1</button><b id="reps" style="font-size:28px">0</b><button class="ghost" id="plus">+ 1</button><button class="ghost" id="plus5">+ 5</button></div><div class="progress"><div class="fill" id="training-bar"></div></div><div class="row"><span class="small muted" id="remaining"></span><button class="primary" id="finish" disabled>Concluir e abrir portal ✨</button></div></div></div>
-<div class="card"><div class="row"><h2>Seu companheiro</h2><span class="tag" id="collection-badge">Surpresa</span></div><div class="avatar-stage"><div class="orbit"></div><div id="gogo-symbol" class="mascot">❔</div></div><h3 id="gogo-title" style="margin-top:19px">Aguardando sorteio...</h3><p id="gogo-description" class="hint">Pegue um bonequinho físico. Quando você digitar seu número, esta ficha será associada ao seu treino.</p><div class="divider"></div><p class="hint">📖 Histórias oficiais só serão mostradas quando verificadas. Você pode preencher o nome para identificar seu bonequinho.</p></div>
-</section>
-<section id="tab-colecoes" class="hidden"><div class="row"><h2>◈ Minha Gogodex</h2><span class="tag">4 coleções</span></div><p class="hint">Marque os Gogo's que você tem. Os números e nomes são registrados por você para evitar informações inventadas.</p><div class="collection-grid" id="collection-grid"></div><div class="card" style="margin-top:20px"><h3>Adicionar à coleção</h3><div class="form"><div class="field"><label for="own-collection">Coleção</label><select id="own-collection"><option>Urban Toys (2008)</option><option>MegaTrip (2009)</option><option>Fut Gogo's (2010)</option><option>Turma da Mônica (2011)</option></select></div><div class="field"><label for="own-number">Número</label><input id="own-number" type="number" min="1" max="999"></div><div class="field"><label for="own-name">Nome opcional</label><input id="own-name" maxlength="60" placeholder="Nome na sua coleção"></div></div><button class="primary" id="save-owned">Salvar Gogo na coleção</button><div id="owned-list" class="records" style="margin-top:18px"></div></div></section>
-<section id="tab-historico" class="hidden"><div class="grid"><div class="card"><h2>▦ Calendário de treinos</h2><div class="row" style="margin-bottom:15px"><button id="prev-month" class="ghost">←</button><strong id="month-label"></strong><button id="next-month" class="ghost">→</button></div><div class="calendar" id="calendar"></div></div><div class="card"><div class="row"><h2>Histórico</h2><button id="export" class="ghost">Exportar JSON</button></div><div id="history" class="records"></div></div></div></section>
-<section id="tab-portal" class="hidden"><div class="grid"><div class="card"><h2>◎ Portal da Vitória</h2><div class="avatar-stage" style="height:230px"><div class="orbit" style="border-width:8px;box-shadow:0 0 75px #7e54ef"></div><span style="font-size:72px">🌀</span></div><p class="hint">Cada Gogo que conclui uma missão atravessa o portal. Suas conquistas ficam preservadas no seu diário.</p></div><div class="card"><h2>✨ Hall dos Concluídos</h2><div id="victory-list" class="records"></div></div></div></section>
-</main><footer class="footer">Projeto independente de fã, sem afiliação com Panini ou Gogo's Crazy Bones. Dados armazenados localmente no seu navegador.</footer></div>
-<div id="portal-overlay" class="portal-backdrop hidden" role="dialog" aria-modal="true" aria-label="Portal da Vitória"><div class="portal-box"><div class="eyebrow">Missão concluída!</div><h2 id="portal-heading" style="margin:12px 0">Portal da Vitória</h2><div class="portal-visual"><div class="vortex"></div><div class="fly" id="flying-gogo">🌟</div></div><p>Seu Gogo voou até o portal! ✨</p><button class="primary wide" id="close-portal">Voltar ao aplicativo</button></div></div>
-<script src="./script.js" defer></script>
-</body></html>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#121419">
+  <title>Rank Ativo</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="shell top">
+    <div class="brand">RANK <span>ATIVO</span></div>
+    <nav aria-label="Navegação"><a href="#missoes">Missões</a><a href="#registro">Registrar</a><a href="#historico">Histórico</a></nav>
+  </header>
+  <main class="shell">
+    <section class="hero" aria-labelledby="rank">
+      <div>
+        <p class="label">Seu progresso</p>
+        <h1 id="rank">Rank E</h1>
+        <p id="level"></p>
+      </div>
+      <div class="xp">
+        <label for="xp-bar" id="xp-label">XP para o próximo nível</label>
+        <progress id="xp-bar" value="0" max="100"></progress>
+        <p id="xp-total"></p>
+      </div>
+    </section>
+    <p id="feedback" role="status"></p>
+    <div class="grid">
+      <section class="card" id="missoes">
+        <h2>Missões de hoje</h2>
+        <p>Escolha uma meta e registre a atividade para ganhar XP extra.</p>
+        <div id="missions"></div>
+      </section>
+      <section class="card" id="registro">
+        <h2>Registrar atividade</h2>
+        <form id="activity">
+          <label for="kind">Atividade</label>
+          <select id="kind" name="kind"></select>
+          <label for="amount" id="amount-label">Repetições</label>
+          <input id="amount" type="number" min="1" step="1" required inputmode="numeric">
+          <div id="duration-field" hidden>
+            <label for="duration">Tempo em minutos (opcional)</label>
+            <input id="duration" type="number" min="1" max="1440" step="1" inputmode="numeric">
+          </div>
+          <button type="submit">Salvar atividade</button>
+        </form>
+      </section>
+    </div>
+    <section class="card" id="historico">
+      <div class="row"><h2>Histórico</h2><button id="export" class="secondary">Exportar JSON</button></div>
+      <ul id="history"></ul>
+    </section>
+  </main>
+</body>
+</html>

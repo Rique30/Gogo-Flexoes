@@ -1,28 +1,173 @@
-(function(){
 'use strict';
-var collections=[{name:'Urban Toys (2008)',icon:'🎭',color:'#ffffff'},{name:'MegaTrip (2009)',icon:'🌌',color:'#ffffff'},{name:"Fut Gogo's (2010)",icon:'⚽',color:'#ffffff'},{name:'Turma da Mônica (2011)',icon:'🐰',color:'#ffffff'}];
-var key='gogo-flex-v1', data={owned:[],history:[]};
-try{var saved=JSON.parse(localStorage.getItem(key)||'null');if(saved && Array.isArray(saved.owned)&&Array.isArray(saved.history))data=saved}catch(e){}
-var active=null,done=0,calMonth=new Date();calMonth.setDate(1);
-function $(id){return document.getElementById(id)}function persist(){localStorage.setItem(key,JSON.stringify(data))}
-function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function localDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
-function fmt(d){return String(d).split('-').reverse().join('/')}
-function icon(c){return (collections.find(function(x){return x.name===c})||collections[0]).icon}
-function updateStats(){$('total-flex').textContent=data.history.reduce(function(a,x){return a+x.reps},0);$('total-days').textContent=new Set(data.history.map(function(x){return x.date})).size;$('total-gogos').textContent=data.owned.length}
-function go(tab){document.querySelectorAll('[id^="tab-"]').forEach(function(el){el.classList.toggle('hidden',el.id!=='tab-'+tab)});document.querySelectorAll('[data-tab]').forEach(function(el){el.classList.toggle('active',el.dataset.tab===tab)});render()}
-document.querySelectorAll('[data-tab]').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.tab)})});
-$('today').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});$('date').value=localDate(new Date());
-function redrawTraining(){if(!active)return;var left=Math.max(0,active.number-done);$('reps').textContent=done;$('remaining').textContent=left===0?'Meta atingida!':'Faltam '+left+' flexões';$('training-bar').style.width=(Math.min(100,done/active.number*100))+'%';$('finish').disabled=done<active.number}
-$('start').onclick=function(){var n=Number($('number').value),c=$('collection').value,d=$('date').value;if(!Number.isInteger(n)||n<1||n>999||!d){alert('Informe um número inteiro entre 1 e 999 e uma data.');return}var o=data.owned.find(function(x){return x.collection===c&&x.number===n});var name=$('gogo-name').value.trim()||(o&&o.name)||'';active={collection:c,number:n,name:name,date:d};done=0;$('training').classList.remove('hidden');$('challenge-number').innerHTML=n+' <em>flexões</em>';$('collection-badge').textContent=c;$('gogo-symbol').textContent=icon(c);$('gogo-title').textContent=name||'Gogo nº '+n;$('gogo-description').textContent='Gogo nº '+n+' • '+c+' • '+fmt(d);redrawTraining()};
-$('plus').onclick=function(){if(active){done=Math.min(active.number,done+1);redrawTraining()}};$('plus5').onclick=function(){if(active){done=Math.min(active.number,done+5);redrawTraining()}};$('minus').onclick=function(){done=Math.max(0,done-1);redrawTraining()};
-$('finish').onclick=function(){if(!active||done<active.number)return;data.history.unshift({id:Date.now(),collection:active.collection,number:active.number,name:active.name,date:active.date,reps:done});if(!data.owned.some(function(x){return x.collection===active.collection&&x.number===active.number}))data.owned.push({collection:active.collection,number:active.number,name:active.name});persist();$('portal-heading').textContent=(active.name||'Gogo nº '+active.number)+' entrou no Portal!';$('flying-gogo').textContent=icon(active.collection);$('flying-gogo').style.animation='none';void $('flying-gogo').offsetWidth;$('flying-gogo').style.animation='flight 2.5s ease-in forwards';$('portal-overlay').classList.remove('hidden');active=null;$('training').classList.add('hidden');$('number').value='';$('gogo-name').value='';updateStats()};
-$('close-portal').onclick=function(){$('portal-overlay').classList.add('hidden');go('portal')};
-$('save-owned').onclick=function(){var c=$('own-collection').value,n=Number($('own-number').value),name=$('own-name').value.trim();if(!Number.isInteger(n)||n<1||n>999){alert('Informe um número válido entre 1 e 999.');return}var old=data.owned.find(function(x){return x.collection===c&&x.number===n});if(old)old.name=name||old.name;else data.owned.push({collection:c,number:n,name:name});persist();$('own-number').value='';$('own-name').value='';render()};
-function renderCollections(){$('collection-grid').innerHTML=collections.map(function(c){var arr=data.owned.filter(function(x){return x.collection===c.name});return '<button class="collection" data-choose="'+esc(c.name)+'"><span class="emoji">'+c.icon+'</span><strong>'+esc(c.name)+'</strong><span class="muted">'+arr.length+' cadastrados</span><div class="progress"><div class="fill" style="width:'+Math.min(100,arr.length)+'%;background:'+c.color+'"></div></div><span class="small">Abrir e registrar →</span></button>'}).join('');document.querySelectorAll('[data-choose]').forEach(function(b){b.onclick=function(){$('own-collection').value=b.dataset.choose;$('own-number').focus()}});$('owned-list').innerHTML=data.owned.length?data.owned.slice().sort(function(a,b){return a.collection.localeCompare(b.collection)||a.number-b.number}).map(function(x){return '<div class="record"><div><b>'+icon(x.collection)+' '+esc(x.name||'Gogo nº '+x.number)+'</b><small>#'+x.number+' • '+esc(x.collection)+'</small></div><button class="ghost" data-remove="'+esc(x.collection)+'|'+x.number+'">Remover</button></div>'}).join(''):'<p class="hint">Nenhum bonequinho cadastrado ainda.</p>';document.querySelectorAll('[data-remove]').forEach(function(b){b.onclick=function(){var p=b.dataset.remove.split('|');data.owned=data.owned.filter(function(x){return !(x.collection===p[0]&&x.number===Number(p[1]))});persist();render()}})}
-function renderHistory(){$('history').innerHTML=data.history.length?data.history.map(function(x){return '<div class="record"><div><b>'+icon(x.collection)+' '+esc(x.name||'Gogo nº '+x.number)+'</b><small>'+fmt(x.date)+' • '+esc(x.collection)+'</small></div><strong>'+x.reps+' 💪</strong></div>'}).join(''):'<p class="hint">Nenhum desafio concluído. Seu primeiro Gogo está esperando!</p>';$('victory-list').innerHTML=data.history.length?data.history.map(function(x){return '<div class="record"><div><b>✨ '+esc(x.name||'Gogo nº '+x.number)+'</b><small>'+fmt(x.date)+' • '+esc(x.collection)+'</small></div><span class="tag">'+x.reps+' flexões</span></div>'}).join(''):'<p class="hint">O portal ainda aguarda seu primeiro visitante.</p>'}
-function renderCalendar(){var year=calMonth.getFullYear(),month=calMonth.getMonth();$('month-label').textContent=calMonth.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});var first=new Date(year,month,1),length=new Date(year,month+1,0).getDate(),start=first.getDay();var s=['D','S','T','Q','Q','S','S'].map(function(x){return '<div class="week">'+x+'</div>'}).join('');for(var i=0;i<start;i++)s+='<div></div>';for(var d=1;d<=length;d++){var date=localDate(new Date(year,month,d)),records=data.history.filter(function(x){return x.date===date});s+='<div class="day '+(records.length?'done':'')+'" title="'+records.length+' desafio(s)">'+d+(records.length?'<div>⭐ '+records.length+'</div>':'')+'</div>'}$('calendar').innerHTML=s}
-$('prev-month').onclick=function(){calMonth.setMonth(calMonth.getMonth()-1);renderCalendar()};$('next-month').onclick=function(){calMonth.setMonth(calMonth.getMonth()+1);renderCalendar()};
-$('export').onclick=function(){var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='gogo-flex-backup.json';a.click();setTimeout(function(){URL.revokeObjectURL(url)},1000)};
-function render(){updateStats();renderCollections();renderHistory();renderCalendar()}render();
-})();
+
+const activities = {
+  pushups: 'Flexões',
+  squats: 'Agachamentos',
+  situps: 'Abdominais',
+  running: 'Corrida'
+};
+const missions = [
+  { kind: 'pushups', goal: 10 },
+  { kind: 'squats', goal: 15 },
+  { kind: 'running', goal: 1 }
+];
+const ranks = ['E', 'D', 'C', 'B', 'A', 'S'];
+const storageKey = 'rank-ativo-v1';
+const xpPerLevel = 100;
+const missionBonus = 20;
+const get = id => document.getElementById(id);
+const form = get('activity');
+const kindInput = get('kind');
+const amountInput = get('amount');
+const durationInput = get('duration');
+
+function readStorage(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key));
+  } catch {
+    return null;
+  }
+}
+
+const saved = readStorage(storageKey);
+const legacy = readStorage('gogo-flex-v1');
+let history = Array.isArray(saved?.history) ? saved.history : (legacy?.history ?? []).map(entry => ({
+  kind: 'pushups',
+  amount: entry.reps,
+  date: entry.date,
+  xp: 0,
+  legacyName: entry.name || `Gogo nº ${entry.number}`
+}));
+
+function today() {
+  const now = new Date();
+  return [now.getFullYear(), now.getMonth() + 1, now.getDate()]
+    .map(value => String(value).padStart(2, '0')).join('-');
+}
+
+function quantity(kind, amount) {
+  const number = amount.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+  if (kind === 'running') return `${number} km`;
+  return `${number} ${amount === 1 ? 'repetição' : 'repetições'}`;
+}
+
+function progressFor(kind, date) {
+  return history.filter(entry => entry.kind === kind && entry.date === date && !entry.legacyName)
+    .reduce((total, entry) => total + Math.round(entry.amount * 100), 0) / 100;
+}
+
+function render() {
+  const xp = history.reduce((total, entry) => total + entry.xp, 0);
+  const level = Math.floor(xp / xpPerLevel) + 1;
+  const rank = ranks[Math.min(Math.floor((level - 1) / 3), ranks.length - 1)];
+  get('rank').textContent = `Rank ${rank}`;
+  get('level').textContent = `Nível ${level}`;
+  get('xp-bar').value = xp % xpPerLevel;
+  get('xp-label').textContent = `${xp % xpPerLevel} de ${xpPerLevel} XP para o próximo nível`;
+  get('xp-total').textContent = `${xp} XP acumulados`;
+
+  get('missions').replaceChildren(...missions.map(({ kind, goal }) => {
+    const item = document.createElement('div');
+    item.className = 'mission';
+    const title = document.createElement('strong');
+    title.textContent = activities[kind];
+    const progress = document.createElement('p');
+    const amount = progressFor(kind, today());
+    progress.textContent = amount >= goal
+      ? `Concluída · +${missionBonus} XP`
+      : `${quantity(kind, amount)} de ${quantity(kind, goal)}`;
+    item.append(title, progress);
+    if (amount < goal) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'secondary';
+      button.textContent = 'Registrar';
+      button.setAttribute('aria-label', `Registrar ${activities[kind].toLowerCase()}`);
+      button.onclick = () => {
+        kindInput.value = kind;
+        updateForm();
+        amountInput.focus();
+      };
+      item.append(button);
+    }
+    return item;
+  }));
+
+  const list = get('history');
+  list.replaceChildren();
+  if (!history.length) {
+    const item = document.createElement('li');
+    item.textContent = 'Nenhuma atividade registrada.';
+    list.append(item);
+  }
+  for (const entry of history) {
+    const item = document.createElement('li');
+    const title = document.createElement('strong');
+    title.textContent = `${activities[entry.kind]} · ${quantity(entry.kind, entry.amount)}`;
+    const details = document.createElement('small');
+    const date = entry.date.split('-').reverse().join('/');
+    const duration = entry.duration ? ` · ${entry.duration} min` : '';
+    details.textContent = `${date}${duration} · ${entry.legacyName || `+${entry.xp} XP`}`;
+    item.append(title, details);
+    list.append(item);
+  }
+}
+
+function updateForm() {
+  const running = kindInput.value === 'running';
+  get('amount-label').textContent = running ? 'Distância em km' : 'Repetições';
+  amountInput.min = running ? '0.01' : '1';
+  amountInput.step = amountInput.min;
+  amountInput.max = running ? '1000' : '10000';
+  amountInput.inputMode = running ? 'decimal' : 'numeric';
+  amountInput.value = '';
+  get('duration-field').hidden = !running;
+  durationInput.disabled = !running;
+  durationInput.value = '';
+}
+
+for (const [kind, label] of Object.entries(activities)) {
+  kindInput.add(new Option(label, kind));
+}
+kindInput.addEventListener('change', updateForm);
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  const kind = kindInput.value;
+  const amount = amountInput.valueAsNumber;
+  const date = today();
+  const mission = missions.find(item => item.kind === kind);
+  const progress = progressFor(kind, date);
+  const completed = mission && progress < mission.goal
+    && Math.round((progress + amount) * 100) >= mission.goal * 100;
+  const xp = Math.max(1, Math.round(kind === 'running' ? amount * 10 : amount))
+    + (completed ? missionBonus : 0);
+  const entry = { kind, amount, date, xp };
+  if (!durationInput.disabled && durationInput.value) entry.duration = durationInput.valueAsNumber;
+  const nextHistory = [entry, ...history];
+  try {
+    localStorage.setItem(storageKey, JSON.stringify({ history: nextHistory }));
+  } catch {
+    get('feedback').textContent = 'O navegador não conseguiu salvar a atividade. Confira o armazenamento e tente novamente.';
+    return;
+  }
+  history = nextHistory;
+  get('feedback').textContent = `Atividade salva. +${xp} XP.${completed ? ' Missão concluída!' : ''}`;
+  updateForm();
+  render();
+});
+
+get('export').onclick = () => {
+  const blob = new Blob([JSON.stringify({ history, ...(legacy ? { legacy } : {}) }, null, 2)], {
+    type: 'application/json'
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'rank-ativo-backup.json';
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
+updateForm();
+render();

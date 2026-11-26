@@ -1,35 +1,13 @@
-# Gogo Flex 💪🌀
+# Rank Ativo
 
-Aplicativo web de treino inspirado na coleção física de Gogo's Crazy Bones. Pegue um bonequinho surpresa, digite o número das costas e conclua o mesmo número de flexões. Ao completar a missão, o personagem voa até o **Portal da Vitória**!
+Aplicativo web em português para registrar exercícios e corridas, completar missões diárias e evoluir do rank E ao S.
 
-## Funcionalidades
+- Registre flexões, agachamentos e abdominais em repetições.
+- Registre corridas em quilômetros, com duração opcional em minutos.
+- Complete metas diárias de 10 flexões, 15 agachamentos e 1 km de corrida para ganhar 20 XP extras por missão.
+- Suba um nível a cada 100 XP e avance de rank a cada três níveis, até o rank S.
+- Consulte seu histórico e exporte um backup em JSON.
 
-- **Desafio:** escolha a coleção, informe o número do bonequinho e a data; registre flexões em séries (+1, +5).
-- **Portal animado:** animação especial de conclusão.
-- **Coleções:** organize Urban Toys (2008), MegaTrip (2009), Fut Gogo's (2010) e Turma da Mônica (2011).
-- **Diário:** histórico, calendário, total de flexões, dias de treino e hall de conquistas.
-- **Backup:** exportação dos dados para arquivo JSON.
-- **Visual:** tema escuro inspirado em anime e jogos, adaptado para celular e computador.
+Abra `index.html` no navegador ou publique os arquivos estáticos na raiz do GitHub Pages. O projeto não tem dependências.
 
-## Como executar
-
-O projeto é feito em HTML, CSS e JavaScript, sem dependências.
-
-1. Baixe ou clone este repositório.
-2. Abra `index.html` no navegador.
-
-### Publicar com GitHub Pages
-
-No GitHub, acesse **Settings → Pages**. Em **Build and deployment**, selecione **Deploy from a branch**, escolha a branch `main` e a pasta `/ (root)` e salve. Aguarde o GitHub apresentar a URL de publicação.
-
-## Privacidade e dados
-
-Os registros ficam no **localStorage** do navegador utilizado. Não há conta nem sincronização entre dispositivos nesta versão. Limpar os dados do navegador pode apagar os registros; utilize **Exportar JSON** para criar um backup. O arquivo exportado ainda não possui função de importação.
-
-Os números e nomes dos Gogo's são informados pelo usuário; imagens, biografias e catálogos oficiais ainda não estão incluídos. Assim, não atribuímos histórias inventadas aos personagens.
-
-**Dica de exercício:** faça pausas, respeite seus limites e reduza ou divida desafios grandes em séries. Pare em caso de dor.
-
-## Créditos
-
-Projeto independente de fã. Não é afiliado nem endossado pela Panini ou pelos titulares de Gogo's Crazy Bones.
+Os dados ficam no armazenamento local do navegador. Se você abrir o Rank Ativo na mesma origem do Gogo Flex, o histórico antigo de flexões aparece no novo app. Esses registros preservam suas datas e repetições. O backup inclui também os dados antigos da coleção quando disponíveis. O registro de corridas é manual.
