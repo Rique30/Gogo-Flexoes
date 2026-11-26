@@ -1,35 +1,19 @@
-# Gogo Flex 💪🌀
+# Sombras do Destino
 
-Aplicativo web de treino inspirado na coleção física de Gogo's Crazy Bones. Pegue um bonequinho surpresa, digite o número das costas e conclua o mesmo número de flexões. Ao completar a missão, o personagem voa até o **Portal da Vitória**!
+Aplicativo web em português para treinar no mundo de **Sombras do Destino**: registre exercícios, corridas, treinos de academia e hábitos, e forme os seis anéis do seu núcleo de mana.
 
-## Funcionalidades
+## Abas
 
-- **Desafio:** escolha a coleção, informe o número do bonequinho e a data; registre flexões em séries (+1, +5).
-- **Portal animado:** animação especial de conclusão.
-- **Coleções:** organize Urban Toys (2008), MegaTrip (2009), Fut Gogo's (2010) e Turma da Mônica (2011).
-- **Diário:** histórico, calendário, total de flexões, dias de treino e hall de conquistas.
-- **Backup:** exportação dos dados para arquivo JSON.
-- **Visual:** tema escuro inspirado em anime e jogos, adaptado para celular e computador.
+- **Início:** emblema do anel atual, nível (até 100), XP, atributos (Força, Resistência e Disciplina), resumo do dia e meta de 4 dias de treino por semana.
+- **Missões:** metas diárias de flexões, agachamentos e corrida, hábitos do dia e registro de atividades.
+- **Academia:** exercícios por grupo muscular, séries, repetições e carga, recordes, gráfico da semana, quantas vezes cada exercício foi feito na semana e fichas de treino com dias da semana.
+- **Jornada:** jornada de 66 dias com sequência de dias seguidos e Modo Difícil (metas e bônus em dobro, dias perdidos tiram XP e 2 dias perdidos seguidos recomeçam a jornada).
+- **Anéis:** do 1º Anel (Bronze, Despertar) ao 6º Anel (Diamante, Ápice Convencional), com Graus 1 a 3, Mestre e Soberano.
+- **Poderes:** caminhos (classes) com bônus de XP, habilidades que se ativam por nível e títulos conquistados por marcos, até Ascendente.
+- **Histórico** e **Ajustes:** registros agrupados por dia, exercícios e hábitos próprios e backup em JSON.
 
-## Como executar
+## Como usar
 
-O projeto é feito em HTML, CSS e JavaScript, sem dependências.
+Abra `index.html` no navegador ou publique o arquivo na raiz do GitHub Pages. É um arquivo único, sem dependências além das fontes do Google Fonts.
 
-1. Baixe ou clone este repositório.
-2. Abra `index.html` no navegador.
-
-### Publicar com GitHub Pages
-
-No GitHub, acesse **Settings → Pages**. Em **Build and deployment**, selecione **Deploy from a branch**, escolha a branch `main` e a pasta `/ (root)` e salve. Aguarde o GitHub apresentar a URL de publicação.
-
-## Privacidade e dados
-
-Os registros ficam no **localStorage** do navegador utilizado. Não há conta nem sincronização entre dispositivos nesta versão. Limpar os dados do navegador pode apagar os registros; utilize **Exportar JSON** para criar um backup. O arquivo exportado ainda não possui função de importação.
-
-Os números e nomes dos Gogo's são informados pelo usuário; imagens, biografias e catálogos oficiais ainda não estão incluídos. Assim, não atribuímos histórias inventadas aos personagens.
-
-**Dica de exercício:** faça pausas, respeite seus limites e reduza ou divida desafios grandes em séries. Pare em caso de dor.
-
-## Créditos
-
-Projeto independente de fã. Não é afiliado nem endossado pela Panini ou pelos titulares de Gogo's Crazy Bones.
+Os dados ficam no armazenamento local do navegador. Registros antigos do Rank Ativo e do Gogo Flex na mesma origem continuam aparecendo.
